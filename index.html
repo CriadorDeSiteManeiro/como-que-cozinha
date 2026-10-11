@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#141612">
+<meta name="description" content="Descubra receitas incríveis com os ingredientes que você já tem em casa.">
+<title>Máquina de Cozinha Legal</title>
+<style>
+:root{
+  --bg:#141612;--panel:#1d201a;--panel2:#252920;
+  --text:#f3f0e7;--muted:#a7aa9c;--green:#c1d09b;
+  --line:#383c32;--gold:#d8bd82;--danger:#e2a08f;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+font-family:Arial,Helvetica,sans-serif;line-height:1.6}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{
+outline:2px solid var(--green);outline-offset:3px}
+a{color:inherit}
+.wrap{width:min(1120px,calc(100% - 36px));margin:auto}
+header{border-bottom:1px solid var(--line)}
+.nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-family:Georgia,serif;font-size:20px;letter-spacing:-.5px}
+.brand span{color:var(--green)}
+.nav-right{display:flex;gap:10px;align-items:center}
+.pill{border:1px solid var(--line);padding:8px 13px;border-radius:30px;
+background:transparent;color:var(--text);font-size:13px}
+.pill.active{border-color:var(--green);color:var(--green)}
+.hero{padding:64px 0 38px}
+.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:11px;
+color:var(--green);font-weight:bold}
+h1,h2,h3,p{margin-top:0}
+h1,h2,.recipe-title{font-family:Georgia,'Times New Roman',serif;font-weight:400}
+h1{font-size:clamp(38px,7vw,67px);line-height:1.05;
+letter-spacing:-2px;max-width:760px;margin:16px 0}
+.hero p{color:var(--muted);max-width:560px}
+.search-box{margin-top:30px;display:flex;gap:10px;max-width:750px}
+.search-box input,.search-input{width:100%;background:var(--panel);
+border:1px solid var(--line);color:var(--text);padding:15px 16px;
+border-radius:5px;min-width:0}
+.btn{background:var(--green);color:#1a2114;border:0;border-radius:5px;
+padding:14px 19px;font-weight:bold;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.secondary{background:transparent;color:var(--text);
+border:1px solid var(--line)}
+.btn.small{padding:8px 12px;font-size:12px}
+.hint{font-size:12px;color:var(--muted);margin-top:10px}
+.section{padding:30px 0 48px}
+.section-head{display:flex;justify-content:space-between;align-items:end;
+gap:16px;margin-bottom:20px}
+h2{font-size:clamp(25px,4vw,35px);margin-bottom:5px}
+.section-head p{color:var(--muted);font-size:13px;margin-bottom:0}
+.ingredient-panel{background:var(--panel);border:1px solid var(--line);
+padding:22px;border-radius:7px}
+.ingredient-tools{display:flex;gap:10px;margin-bottom:18px}
+.ingredient-tools input{flex:1;min-width:0}
+.ingredient-list{display:flex;flex-wrap:wrap;gap:8px}
+.ingredient{border:1px solid var(--line);border-radius:4px;padding:8px 11px;
+background:#24271f;color:#d8d9d0;font-size:13px}
+.ingredient.selected{background:#333d2b;border-color:var(--green);color:#e3edcf}
+.ingredient.selected:before{content:"✓ ";color:var(--green)}
+.ingredient:disabled{opacity:.3;cursor:default}
+.selected-summary{color:var(--muted);font-size:12px;margin-top:16px}
+.filters{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:22px 0}
+.filter{background:var(--panel);border:1px solid var(--line);
+border-radius:4px;color:var(--text);padding:10px 12px}
+.filter-label{font-size:12px;color:var(--muted)}
+.results-count{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:19px}
+.card{background:var(--panel);border:1px solid var(--line);
+border-radius:6px;overflow:hidden;min-width:0;display:flex;flex-direction:column}
+.photo{height:200px;background:#2a2d24;position:relative;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;
+transition:transform .4s}
+.card:hover .photo img{transform:scale(1.035)}
+.photo-label{position:absolute;left:12px;top:12px;background:#141612e8;
+padding:5px 9px;border-radius:3px;font-size:11px}
+.heart{position:absolute;right:12px;top:12px;width:35px;height:35px;
+border:1px solid #ffffff50;background:#141612df;color:white;
+border-radius:50%;font-size:19px}
+.heart.saved{color:#f0a39b}
+.card-body{padding:17px;display:flex;flex-direction:column;flex:1}
+.card-meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.recipe-title{font-size:24px;line-height:1.2;margin:10px 0}
+.description{color:#b6b8ac;font-size:13px;line-height:1.6}
+.match{margin:12px 0;padding:11px;background:#272c22;border-radius:4px;
+font-size:12px;color:#d6dfc8}
+.match strong{color:var(--green)}
+.missing{color:var(--gold)}
+.card-bottom{margin-top:auto;padding-top:14px;display:flex;justify-content:space-between;
+align-items:center;gap:8px}
+.card-bottom .btn{font-size:12px;padding:10px 12px}
+.empty{border:1px dashed var(--line);padding:40px 20px;text-align:center;
+color:var(--muted);grid-column:1/-1}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:12px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);
+border-radius:8px;padding:0;width:min(680px,calc(100% - 24px));
+max-height:88vh;overflow:auto}
+dialog::backdrop{background:#000b;backdrop-filter:blur(4px)}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--line);
+display:flex;justify-content:space-between;gap:12px;align-items:center}
+.modal-head h2{font-size:25px}
+.close{background:none;border:1px solid var(--line);color:var(--text);
+border-radius:4px;padding:6px 10px}
+.modal-content{padding:22px}
+.modal-content h3{font-family:Georgia,serif;font-size:21px;font-weight:400;margin-top:24px}
+.modal-content li{margin:7px 0;color:#d1d1c7}
+.modal-content ul,.modal-content ol{padding-left:22px}
+.modal-photo{width:100%;max-height:260px;object-fit:cover;border-radius:4px}
+.notice{color:var(--muted);font-size:12px;margin-top:18px}
+.hidden{display:none!important}
+@media(max-width:800px){
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.photo{height:175px}
+.hero{padding-top:48px}
+}
+@media(max-width:540px){
+.wrap{width:calc(100% - 26px)}
+.nav{height:65px}
+.brand{font-size:17px}
+.nav-right .pill{padding:7px 9px;font-size:12px}
+.hero{padding-top:38px}
+h1{letter-spacing:-1.3px}
+.search-box{flex-direction:column}
+.search-box .btn{width:100%}
+.grid{grid-template-columns:1fr}
+.photo{height:230px}
+.ingredient-panel{padding:15px}
+.ingredient-tools{flex-direction:column}
+.section-head{align-items:start;flex-direction:column}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <div class="brand">Máquina de <span>Cozinha Legal.</span></div>
+    <div class="nav-right">
+      <button class="pill active" id="allBtn">Receitas</button>
+      <button class="pill" id="favBtn">♡ Favoritos <span id="favCount">0</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Cozinhe com o que você tem</div>
+    <h1>Boas receitas começam<br>na sua cozinha.</h1>
+    <p>Escolha seus ingredientes. Encontraremos receitas que fazem sentido para o que já está na sua despensa.</p>
+    <div class="search-box">
+      <input id="mainSearch" placeholder="Ex.: frango, arroz, tomate..." aria-label="Buscar ingredientes">
+      <button class="btn" id="searchBtn">Encontrar receitas ↗</button>
+    </div>
+    <div class="hint">Digite um ingrediente ou selecione vários abaixo. Não precisa preencher tudo.</div>
+  </section>
+
+  <section class="section" id="ingredientsSection">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">01 / Sua despensa</div>
+        <h2>O que você tem?</h2>
+        <p>Selecione tudo o que pode usar agora.</p>
+      </div>
+      <button class="btn secondary small" id="clearBtn">Limpar seleção</button>
+    </div>
+    <div class="ingredient-panel">
+      <div class="ingredient-tools">
+        <input class="search-input" id="ingredientSearch" placeholder="Procurar ingrediente..." aria-label="Filtrar lista de ingredientes">
+        <button class="btn secondary" id="addIngredientBtn">+ Adicionar</button>
+      </div>
+      <div class="ingredient-list" id="ingredientList"></div>
+      <div class="selected-summary" id="selectedSummary">Nenhum ingrediente selecionado.</div>
+    </div>
+    <div class="filters">
+      <span class="filter-label">Filtrar resultados:</span>
+      <select class="filter" id="timeFilter" aria-label="Tempo máximo">
+        <option value="999">Qualquer tempo</option>
+        <option value="15">Até 15 minutos</option>
+        <option value="30">Até 30 minutos</option>
+        <option value="45">Até 45 minutos</option>
+      </select>
+      <select class="filter" id="difficultyFilter" aria-label="Dificuldade">
+        <option value="all">Todas as dificuldades</option>
+        <option value="Fácil">Fácil</option>
+        <option value="Média">Média</option>
+      </select>
+      <select class="filter" id="missingFilter" aria-label="Ingredientes faltantes">
+        <option value="all">Qualquer disponibilidade</option>
+        <option value="0">Só receitas completas</option>
+        <option value="2">No máximo 2 faltantes</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="section" id="resultsSection">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">02 / Seleção da cozinha</div>
+        <h2 id="resultsTitle">Receitas para descobrir</h2>
+        <p id="resultsSubtitle">Escolha ingredientes para personalizar as sugestões.</p>
+      </div>
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+    <div class="grid" id="recipeGrid"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Máquina de Cozinha Legal © 2026</span>
+    <span>Feito para aproveitar melhor o que você já tem.</span>
+  </div>
+</footer>
+
+<dialog id="recipeDialog">
+  <div class="modal-head">
+    <h2 id="modalTitle">Receita</h2>
+    <button class="close" id="closeModal">Fechar ✕</button>
+  </div>
+  <div class="modal-content" id="modalContent"></div>
+</dialog>
+
+<script>
+"use strict";
+
+/* Catálogo local: nenhuma API é necessária. */
+const recipes = [
+{
+id:1,name:"Arroz de frigideira com ovo",category:"Rápida",
+time:15,difficulty:"Fácil",servings:2,
+ingredients:[
+["arroz cozido","2 xícaras"],["ovo","2 unidades"],["alho","1 dente"],
+["cebola","1/2 unidade"],["óleo","1 colher de sopa"],["sal","a gosto"]
+],
+description:"Uma refeição simples, econômica e ótima para aproveitar arroz que sobrou.",
+steps:[
+"Aqueça o óleo em uma frigideira e refogue o alho e a cebola picados.",
+"Adicione o arroz cozido e mexa até aquecer por igual.",
+"Abra espaço na frigideira, acrescente os ovos e mexa até ficarem cozidos.",
+"Misture tudo, ajuste o sal e sirva."
+],
+image:"https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80",
+alt:"Prato de arroz preparado"
+},
+{
+id:2,name:"Omelete de queijo e tomate",category:"Clássico",
+time:12,difficulty:"Fácil",servings:1,
+ingredients:[
+["ovo","3 unidades"],["queijo","50 g"],["tomate","1 unidade"],
+["leite","1 colher de sopa"],["óleo","1 colher de chá"],["sal","a gosto"]
+],
+description:"Omelete macia com queijo derretido e tomate fresco.",
+steps:[
+"Bata os ovos com o leite e uma pitada de sal.",
+"Corte o tomate em cubos e rale ou pique o queijo.",
+"Aqueça uma frigideira untada e despeje os ovos.",
+"Quando começarem a firmar, espalhe o tomate e o queijo. Dobre a omelete e termine de cozinhar."
+],
+image:"https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=80",
+alt:"Ovos preparados para uma refeição"
+},
+{
+id:3,name:"Macarrão ao alho e óleo",category:"Italiana",
+time:20,difficulty:"Fácil",servings:2,
+ingredients:[
+["macarrão","200 g"],["alho","3 dentes"],["óleo","3 colheres de sopa"],
+["sal","a gosto"],["pimenta-do-reino","a gosto"]
+],
+description:"Um clássico de poucos ingredientes, com alho dourado e massa bem temperada.",
+steps:[
+"Cozinhe o macarrão em água fervente com sal conforme a embalagem.",
+"Fatie o alho e aqueça o óleo em fogo baixo.",
+"Doure o alho lentamente, sem deixar queimar.",
+"Junte o macarrão escorrido e um pouco da água do cozimento. Misture e tempere com pimenta."
+],
+image:"https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=900&q=80",
+alt:"Prato de massa com molho"
+},
+{
+id:4,name:"Panqueca caseira",category:"Conforto",
+time:25,difficulty:"Fácil",servings:3,
+ingredients:[
+["farinha de trigo","1 xícara"],["leite","1 xícara"],["ovo","1 unidade"],
+["óleo","1 colher de sopa"],["sal","1 pitada"]
+],
+description:"Massa versátil que pode receber recheio doce ou salgado.",
+steps:[
+"Bata a farinha, o leite, o ovo, o óleo e o sal até obter uma massa uniforme.",
+"Aqueça uma frigideira antiaderente levemente untada.",
+"Coloque uma pequena porção da massa e gire a frigideira para espalhar.",
+"Cozinhe dos dois lados. Repita com o restante da massa e acrescente o recheio desejado."
+],
+image:"https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=900&q=80",
+alt:"Panquecas caseiras"
+},
+{
+id:5,name:"Frango dourado com batatas",category:"Almoço",
+time:40,difficulty:"Média",servings:3,
+ingredients:[
+["frango","500 g"],["batata","3 unidades"],["alho","2 dentes"],
+["cebola","1 unidade"],["óleo","2 colheres de sopa"],["sal","a gosto"],
+["páprica","1 colher de chá"]
+],
+description:"Frango bem temperado com batatas macias e bordas douradas.",
+steps:[
+"Corte o frango em pedaços e tempere com sal, alho e páprica.",
+"Descasque as batatas e corte em pedaços de tamanho parecido.",
+"Aqueça o óleo numa panela ou frigideira funda e doure o frango.",
+"Adicione a cebola e as batatas. Junte um pouco de água, tampe e cozinhe até tudo ficar bem cozido.",
+"Destampe no final para reduzir o líquido e dourar os ingredientes."
+],
+image:"https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=900&q=80",
+alt:"Frango assado com acompanhamento"
+},
+{
+id:6,name:"Tomate recheado com queijo",category:"Leve",
+time:25,difficulty:"Fácil",servings:2,
+ingredients:[
+["tomate","2 unidades"],["queijo","100 g"],["alho","1 dente"],
+["óleo","1 colher de chá"],["sal","a gosto"],["orégano","a gosto"]
+],
+description:"Tomates macios com recheio de queijo gratinado e ervas.",
+steps:[
+"Lave os tomates, corte uma tampa e retire parte das sementes.",
+"Misture o queijo picado com alho, orégano e uma pitada de sal.",
+"Recheie os tomates e coloque-os numa assadeira levemente untada.",
+"Asse a 200 °C por cerca de 15 a 20 minutos, até o tomate amaciar e o queijo derreter."
+],
+image:"https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80",
+alt:"Prato de vegetais preparados"
+},
+{
+id:7,name:"Purê de batata cremoso",category:"Acompanhamento",
+time:25,difficulty:"Fácil",servings:3,
+ingredients:[
+["batata","4 unidades"],["leite","1/2 xícara"],["manteiga","1 colher de sopa"],
+["sal","a gosto"],["queijo","opcional"]
+],
+description:"Acompanhamento clássico, macio e fácil de combinar com outros pratos.",
+steps:[
+"Descasque as batatas, corte em pedaços e cozinhe em água até ficarem macias.",
+"Escorra bem e amasse ainda quentes.",
+"Acrescente a manteiga e o leite aos poucos, mexendo até chegar à textura desejada.",
+"Acerte o sal. Se quiser, finalize com queijo ralado."
+],
+image:"https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=900&q=80",
+alt:"Comida caseira servida em prato"
+},
+{
+id:8,name:"Arroz cremoso com queijo",category:"Conforto",
+time:20,difficulty:"Fácil",servings:2,
+ingredients:[
+["arroz cozido","2 xícaras"],["leite","1/2 xícara"],["queijo","100 g"],
+["manteiga","1 colher de sopa"],["alho","1 dente"],["sal","a gosto"]
+],
+description:"Arroz reaproveitado em uma versão cremosa e reconfortante.",
+steps:[
+"Refogue o alho na manteiga em fogo baixo.",
+"Acrescente o arroz cozido e misture.",
+"Adicione o leite aos poucos e mexa até aquecer.",
+"Junte o queijo, mexa até derreter e ajuste o sal. Sirva imediatamente."
+],
+image:"https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=900&q=80",
+alt:"Arroz preparado e servido"
+},
+{
+id:9,name:"Salada de tomate e queijo",category:"Leve",
+time:10,difficulty:"Fácil",servings:2,
+ingredients:[
+["tomate","3 unidades"],["queijo","100 g"],["óleo","1 colher de sopa"],
+["sal","a gosto"],["orégano","a gosto"]
+],
+description:"Uma salada fresca, rápida e com poucos ingredientes.",
+steps:[
+"Lave os tomates e corte em fatias.",
+"Corte o queijo em cubos ou fatias.",
+"Disponha tudo num prato, tempere com óleo, sal e orégano e sirva."
+],
+image:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80",
+alt:"Salada fresca de vegetais"
+},
+{
+id:10,name:"Bolo simples de caneca",category:"Doce",
+time:8,difficulty:"Fácil",servings:1,
+ingredients:[
+["farinha de trigo","4 colheres de sopa"],["açúcar","2 colheres de sopa"],
+["leite","3 colheres de sopa"],["ovo","1 unidade"],
+["óleo","1 colher de sopa"],["fermento químico","1/2 colher de chá"]
+],
+description:"Um bolo individual para matar a vontade de comer doce.",
+steps:[
+"Use uma caneca grande própria para micro-ondas.",
+"Misture a farinha, o açúcar e o fermento.",
+"Adicione o ovo, o leite e o óleo. Misture até a massa ficar uniforme.",
+"Leve ao micro-ondas por cerca de 1 minuto e 30 segundos a 2 minutos, verificando o ponto. O tempo varia conforme a potência."
+],
+image:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=80",
+alt:"Bolo de chocolate"
+},
+{
+id:11,name:"Legumes salteados",category:"Leve",
+time:18,difficulty:"Fácil",servings:2,
+ingredients:[
+["cenoura","1 unidade"],["batata","1 unidade"],["cebola","1/2 unidade"],
+["alho","1 dente"],["óleo","1 colher de sopa"],["sal","a gosto"]
+],
+description:"Legumes simples, coloridos e temperados para acompanhar a refeição.",
+steps:[
+"Lave e corte os legumes em pedaços pequenos.",
+"Cozinhe a batata e a cenoura em água até começarem a amaciar; escorra.",
+"Aqueça o óleo e refogue a cebola e o alho.",
+"Adicione os legumes e salteie até terminar o cozimento. Ajuste o sal."
+],
+image:"https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80",
+alt:"Legumes frescos e coloridos"
+},
+{
+id:12,name:"Sanduíche quente de queijo",category:"Rápida",
+time:10,difficulty:"Fácil",servings:1,
+ingredients:[
+["pão","2 fatias"],["queijo","2 fatias"],["manteiga","1 colher de chá"]
+],
+description:"Um sanduíche tostado por fora e com queijo derretido por dentro.",
+steps:[
+"Passe uma camada fina de manteiga no lado externo do pão.",
+"Coloque o queijo entre as fatias.",
+"Leve a uma frigideira em fogo baixo, pressionando levemente.",
+"Doure dos dois lados até o queijo derreter e sirva quente."
+],
+image:"https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=900&q=80",
+alt:"Sanduíche preparado"
+},
+{
+id:13,name:"Frango cremoso de panela",category:"Almoço",
+time:30,difficulty:"Média",servings:3,
+ingredients:[
+["frango","400 g"],["creme de leite","1 caixa"],["cebola","1 unidade"],
+["alho","2 dentes"],["óleo","1 colher de sopa"],["sal","a gosto"],
+["páprica","1 colher de chá"]
+],
+description:"Frango suculento em molho cremoso para servir com arroz ou massa.",
+steps:[
+"Corte o frango em cubos e tempere com sal e páprica.",
+"Doure o frango no óleo quente, em etapas se necessário.",
+"Adicione a cebola e o alho e refogue até ficarem macios.",
+"Junte um pouco de água, tampe e cozinhe até o frango estar completamente cozido.",
+"Reduza o fogo, adicione o creme de leite e aqueça sem deixar ferver intensamente."
+],
+image:"https://images.unsplash.com/photo-1604908177522-040d4f6f1a24?auto=format&fit=crop&w=900&q=80",
+alt:"Prato de frango cremoso"
+},
+{
+id:14,name:"Macarrão cremoso de queijo",category:"Conforto",
+time:25,difficulty:"Fácil",servings:2,
+ingredients:[
+["macarrão","200 g"],["queijo","100 g"],["leite","1 xícara"],
+["manteiga","1 colher de sopa"],["farinha de trigo","1 colher de chá"],["sal","a gosto"]
+],
+description:"Massa envolvida por um molho suave de queijo preparado na panela.",
+steps:[
+"Cozinhe o macarrão conforme as instruções da embalagem e escorra.",
+"Derreta a manteiga numa panela e misture a farinha.",
+"Acrescente o leite aos poucos, mexendo até engrossar levemente.",
+"Adicione o queijo e mexa até derreter. Tempere com sal.",
+"Junte o macarrão ao molho e misture. Se necessário, ajuste a textura com um pouco de leite."
+],
+image:"https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=80",
+alt:"Massa com molho cremoso"
+},
+{
+id:15,name:"Ovos mexidos cremosos",category:"Rápida",
+time:8,difficulty:"Fácil",servings:1,
+ingredients:[
+["ovo","2 unidades"],["manteiga","1 colher de chá"],["leite","1 colher de sopa"],
+["sal","a gosto"],["queijo","opcional"]
+],
+description:"Ovos macios preparados lentamente, ideais para o café da manhã.",
+steps:[
+"Bata os ovos com o leite e uma pitada de sal.",
+"Derreta a manteiga numa frigideira em fogo baixo.",
+"Adicione os ovos e mexa continuamente com uma espátula.",
+"Retire do fogo quando ainda estiverem ligeiramente úmidos; o calor residual termina o cozimento. Se quiser, adicione queijo."
+],
+image:"https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=80",
+alt:"Ovos para café da manhã"
+}
+];
+
+/* Ingredientes básicos que podem ser presumidos somente se o usuário
+   os selecionar. Não assumimos que a pessoa possui itens extras. */
+const commonIngredients = [
+"arroz cozido","batata","cenoura","cebola","alho","tomate","ovo",
+"queijo","leite","manteiga","farinha de trigo","açúcar","fermento químico",
+"frango","creme de leite","macarrão","pão","óleo","sal",
+"pimenta-do-reino","páprica","orégano"
+];
+
+const aliases = {
+"ovos":"ovo","ovo":"ovo","tomates":"tomate","batatas":"batata",
+"cenouras":"cenoura","cebolas":"cebola","dentes de alho":"alho",
+"alho picado":"alho","queijos":"queijo","leite integral":"leite",
+"manteiga":"manteiga","farinha":"farinha de trigo","trigo":"farinha de trigo",
+"macarrão":"macarrão","massa":"macarrão","arroz":"arroz cozido",
+"arroz pronto":"arroz cozido","arroz do dia anterior":"arroz cozido",
+"peito de frango":"frango","filé de frango":"frango",
+"frango desfiado":"frango","pães":"pão","creme de leite":"creme de leite",
+"óleo":"óleo","oleo":"óleo","açúcar":"açúcar","acucar":"açúcar",
+"fermento":"fermento químico"
+};
+
+const normalize = value => value.trim().toLocaleLowerCase("pt-BR")
+.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+
+function canonical(value){
+  const normalized=normalize(value);
+  for(const [alias,target] of Object.entries(aliases)){
+    if(normalize(alias)===normalized) return target;
+  }
+  return normalized;
+}
+
+let selected = new Set();
+let favorites = new Set();
+let favoritesOnly = false;
+let currentRecipes = [];
+let activeRecipe = null;
+
+try{
+  const saved=JSON.parse(localStorage.getItem("mckl-favorites")||"[]");
+  if(Array.isArray(saved)) favorites=new Set(saved.filter(Number.isInteger));
+}catch(e){}
+
+/* Uma receita é avaliada por cobertura, ingredientes em falta
+   e bônus de compatibilidade, sem exigir que a pessoa tenha tudo. */
+function evaluate(recipe){
+  const required=recipe.ingredients
+    .map(item=>item[0])
+    .filter(name=>!["sal","óleo"].includes(name));
+  if(selected.size===0){
+    return {score:0,matched:0,total:required.length,missing:required.length,
+      present:[],absent:required};
+  }
+  const present=required.filter(name=>selected.has(canonical(name)));
+  const absent=required.filter(name=>!selected.has(canonical(name)));
+  const coverage=present.length/Math.max(required.length,1);
+  const missingPenalty=absent.length*2.2;
+  const score=Math.max(0,Math.round(coverage*100-missingPenalty));
+  return {score,matched:present.length,total:required.length,
+    missing:absent.length,present,absent};
+}
+
+function renderIngredients(){
+  const list=document.getElementById("ingredientList");
+  const query=normalize(document.getElementById("ingredientSearch").value);
+  list.replaceChildren();
+  commonIngredients.filter(name=>normalize(name).includes(query)).forEach(name=>{
+    const btn=document.createElement("button");
+    btn.className="ingredient"+(selected.has(canonical(name))?" selected":"");
+    btn.textContent=name;
+    btn.type="button";
+    btn.setAttribute("aria-pressed",selected.has(canonical(name))?"true":"false");
+    btn.addEventListener("click",()=>{
+      const key=canonical(name);
+      if(selected.has(key)) selected.delete(key); else selected.add(key);
+      renderIngredients();
+      renderRecipes();
+    });
+    list.appendChild(btn);
+  });
+  document.getElementById("selectedSummary").textContent=
+    selected.size ? selected.size+" ingrediente(s): "+[...selected].join(", ")
+    : "Nenhum ingrediente selecionado. Mostrando todas as receitas.";
+}
+
+function renderRecipes(){
+  const grid=document.getElementById("recipeGrid");
+  const maxTime=Number(document.getElementById("timeFilter").value);
+  const difficulty=document.getElementById("difficultyFilter").value;
+  const maxMissing=document.getElementById("missingFilter").value;
+  let items=recipes.map(recipe=>({recipe,match:evaluate(recipe)}));
+  items=items.filter(item=>item.recipe.time<=maxTime);
+  if(difficulty!=="all") items=items.filter(item=>item.recipe.difficulty===difficulty);
+  if(maxMissing!=="all" && selected.size>0)
+    items=items.filter(item=>item.match.missing<=Number(maxMissing));
+  if(favoritesOnly) items=items.filter(item=>favorites.has(item.recipe.id));
+  if(selected.size>0){
+    items.sort((a,b)=>b.match.score-a.match.score
+      ||a.match.missing-b.match.missing
+      ||a.recipe.time-b.recipe.time);
+  }else{
+    items.sort((a,b)=>a.recipe.time-b.recipe.time);
+  }
+  currentRecipes=items;
+  grid.replaceChildren();
+  document.getElementById("resultsTitle").textContent=
+    favoritesOnly?"Suas receitas favoritas":"Receitas para descobrir";
+  document.getElementById("resultsSubtitle").textContent=
+    selected.size>0?"Ordenadas pela compatibilidade com seus ingredientes."
+    :"Explore as opções ou selecione ingredientes para personalizar.";
+  document.getElementById("resultsCount").textContent=items.length+" receita(s)";
+  document.getElementById("favCount").textContent=favorites.size;
+
+  if(!items.length){
+    const empty=document.createElement("div");
+    empty.className="empty";
+    empty.textContent=favoritesOnly
+      ?"Você ainda não salvou receitas favoritas."
+      :"Nenhuma receita corresponde a esses filtros. Tente aumentar o tempo ou limpar um filtro.";
+    grid.appendChild(empty);
+    return;
+  }
+
+  items.forEach(({recipe,match})=>{
+    const card=document.createElement("article");
+    card.className="card";
+    const photo=document.createElement("div");
+    photo.className="photo";
+    const img=document.createElement("img");
+    img.src=recipe.image;img.alt=recipe.alt;img.loading="lazy";
+    img.onerror=()=>{img.style.display="none";photo.style.background="#30352a";};
+    photo.appendChild(img);
+    const category=document.createElement("span");
+    category.className="photo-label";category.textContent=recipe.category;
+    photo.appendChild(category);
+    const heart=document.createElement("button");
+    heart.className="heart"+(favorites.has(recipe.id)?" saved":"");
+    heart.textContent=favorites.has(recipe.id)?"♥":"♡";
+    heart.setAttribute("aria-label",favorites.has(recipe.id)?"Remover dos favoritos":"Adicionar aos favoritos");
+    heart.addEventListener("click",()=>{
+      if(favorites.has(recipe.id)) favorites.delete(recipe.id);
+      else favorites.add(recipe.id);
+      saveFavorites();renderRecipes();
+    });
+    photo.appendChild(heart);
+
+    const body=document.createElement("div");body.className="card-body";
+    const meta=document.createElement("div");meta.className="card-meta";
+    meta.textContent="◷ "+recipe.time+" min  ·  "+recipe.difficulty+"  ·  "+recipe.servings+" porção(ões)";
+    const title=document.createElement("h3");title.className="recipe-title";title.textContent=recipe.name;
+    const desc=document.createElement("p");desc.className="description";desc.textContent=recipe.description;
+    body.append(meta,title,desc);
+
+    if(selected.size>0){
+      const matchBox=document.createElement("div");matchBox.className="match";
+      const strong=document.createElement("strong");
+      strong.textContent=match.matched+" de "+match.total+" ingredientes principais disponíveis";
+      matchBox.appendChild(strong);
+      if(match.absent.length){
+        const missing=document.createElement("div");missing.className="missing";
+        missing.style.marginTop="5px";
+        missing.textContent="Faltam: "+match.absent.join(", ");
+        matchBox.appendChild(missing);
+      }else{
+        const complete=document.createElement("div");
+        complete.textContent="Você tem todos os ingredientes principais.";
+        complete.style.marginTop="5px";
+        matchBox.appendChild(complete);
+      }
+      body.appendChild(matchBox);
+    }
+
+    const bottom=document.createElement("div");bottom.className="card-bottom";
+    const score=document.createElement("span");score.className="results-count";
+    score.textContent=selected.size>0?match.score+"% compatível":"Ver receita";
+    const open=document.createElement("button");open.className="btn";open.textContent="Ver receita ↗";
+    open.addEventListener("click",()=>openRecipe(recipe));
+    bottom.append(score,open);body.appendChild(bottom);
+    card.append(photo,body);grid.appendChild(card);
+  });
+}
+
+function saveFavorites(){
+  try{localStorage.setItem("mckl-favorites",JSON.stringify([...favorites]));}
+  catch(e){alert("Não foi possível salvar os favoritos neste navegador.");}
+}
+
+function openRecipe(recipe){
+  activeRecipe=recipe;
+  const match=evaluate(recipe);
+  document.getElementById("modalTitle").textContent=recipe.name;
+  const content=document.getElementById("modalContent");
+  content.replaceChildren();
+  const img=document.createElement("img");
+  img.className="modal-photo";img.src=recipe.image;img.alt=recipe.alt;
+  img.onerror=()=>img.style.display="none";
+  content.appendChild(img);
+  const meta=document.createElement("p");
+  meta.className="card-meta";
+  meta.textContent=recipe.time+" minutos · "+recipe.difficulty+" · "+recipe.servings+" porção(ões)";
+  content.appendChild(meta);
+  const description=document.createElement("p");description.textContent=recipe.description;
+  content.appendChild(description);
+  if(selected.size>0 && match.absent.length){
+    const warning=document.createElement("p");warning.className="missing";
+    warning.textContent="Você ainda precisa de: "+match.absent.join(", ")+".";
+    content.appendChild(warning);
+  }
+  const ih=document.createElement("h3");ih.textContent="Ingredientes";
+  content.appendChild(ih);
+  const ul=document.createElement("ul");
+  recipe.ingredients.forEach(([name,amount])=>{
+    const li=document.createElement("li");
+    li.textContent=amount+" — "+name;
+    if(selected.has(canonical(name)))li.textContent+=" ✓";
+    ul.appendChild(li);
+  });
+  content.appendChild(ul);
+  const sh=document.createElement("h3");sh.textContent="Modo de preparo";
+  content.appendChild(sh);
+  const ol=document.createElement("ol");
+  recipe.steps.forEach(step=>{
+    const li=document.createElement("li");li.textContent=step;ol.appendChild(li);
+  });
+  content.appendChild(ol);
+  const note=document.createElement("p");note.className="notice";
+  note.textContent="Confira o ponto de cozimento e ajuste o tempero ao seu gosto. Tempos são estimativas.";
+  content.appendChild(note);
+  document.getElementById("recipeDialog").showModal();
+}
+
+function addCustomIngredient(){
+  const input=document.getElementById("mainSearch");
+  const values=input.value.split(/[,;]+/).map(v=>v.trim()).filter(Boolean);
+  if(!values.length){input.focus();return;}
+  values.forEach(value=>{
+    const key=canonical(value);
+    if(key && key.length<45)selected.add(key);
+  });
+  input.value="";
+  renderIngredients();renderRecipes();
+  document.getElementById("ingredientsSection").scrollIntoView({behavior:"smooth"});
+}
+
+document.getElementById("ingredientSearch").addEventListener("input",renderIngredients);
+document.getElementById("addIngredientBtn").addEventListener("click",addCustomIngredient);
+document.getElementById("searchBtn").addEventListener("click",addCustomIngredient);
+document.getElementById("mainSearch").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();addCustomIngredient();}
+});
+document.getElementById("clearBtn").addEventListener("click",()=>{
+  selected.clear();renderIngredients();renderRecipes();
+});
+["timeFilter","difficultyFilter","missingFilter"].forEach(id=>
+  document.getElementById(id).addEventListener("change",renderRecipes));
+document.getElementById("favBtn").addEventListener("click",()=>{
+  favoritesOnly=true;
+  document.getElementById("favBtn").classList.add("active");
+  document.getElementById("allBtn").classList.remove("active");
+  renderRecipes();
+  document.getElementById("resultsSection").scrollIntoView({behavior:"smooth"});
+});
+document.getElementById("allBtn").addEventListener("click",()=>{
+  favoritesOnly=false;
+  document.getElementById("allBtn").classList.add("active");
+  document.getElementById("favBtn").classList.remove("active");
+  renderRecipes();
+});
+document.getElementById("closeModal").addEventListener("click",()=>{
+  document.getElementById("recipeDialog").close();
+});
+document.getElementById("recipeDialog").addEventListener("click",e=>{
+  if(e.target===document.getElementById("recipeDialog"))
+    document.getElementById("recipeDialog").close();
+});
+
+renderIngredients();
+renderRecipes();
+</script>
+</body>
+</html>
